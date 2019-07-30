@@ -31,7 +31,65 @@
 using namespace frc;
 using namespace std;
 
+  //Drive Setup
+  static const int leftLeadDeviceID = 1, rightLeadDeviceID = 3, leftFollowDeviceID = 2 , rightFollowDeviceID = 4;
+  rev::CANSparkMax m_leftLeadMotor{leftLeadDeviceID, rev::CANSparkMax::MotorType::kBrushless};
+  rev::CANSparkMax m_rightLeadMotor{rightLeadDeviceID, rev::CANSparkMax::MotorType::kBrushless};
+  rev::CANSparkMax m_leftFollowMotor{leftFollowDeviceID, rev::CANSparkMax::MotorType::kBrushless};
+  rev::CANSparkMax m_rightFollowMotor{rightFollowDeviceID, rev::CANSparkMax::MotorType::kBrushless};
+
+  //INIT INPUTS CLASS
+  robotIO* inputs = new robotIO;
+
+  string _sb;
+
+  //Elevator Setup
+  static const int ElevatorOneID = 5;
+  rev::CANSparkMax m_ElevatorOne{ElevatorOneID, rev::CANSparkMax::MotorType::kBrushless};
+
+  static const int ElevatorTwoID = 6;
+  rev::CANSparkMax m_ElevatorTwo{ElevatorTwoID, rev::CANSparkMax::MotorType::kBrushless};
+
+    rev::CANPIDController m_pidController = m_shoulder.GetPIDController();
+
+  // Encoder object created to display position values
+  rev::CANEncoder m_encoder = m_shoulder.GetEncoder();
+
+    // PID coefficients
+  double kP = 0.65, kI = 0.00005, kD = 0.05, kIz = 0, kFF = 0, kMaxOutput = 0.3, kMinOutput = -0.80;
+
+//LOGITECH CAMERA INIT
+static void VisionThread()
+    {
+        cs::UsbCamera camera = CameraServer::GetInstance()->StartAutomaticCapture();
+        camera.SetResolution(272, 204);
+        camera.SetFPS(22);
+    }
+
 void Robot::RobotInit() {
+  static const int RollerID = 1;
+
+  limitSwitch = new DigitalInput(1);
+  //Roller Setup
+  Roller = new WPI_VictorSPX(RollerID);
+
+  //SET FOLLOWER MOTORS FOR DRIVE
+  m_leftFollowMotor.Follow(m_leftLeadMotor);
+  m_rightFollowMotor.Follow(m_rightLeadMotor);
+
+  //Set PID coefficients
+  m_pidController.SetP(kP);
+  m_pidController.SetI(kI);
+  m_pidController.SetD(kD);
+  m_pidController.SetIZone(kIz);
+  m_pidController.SetFF(kFF);
+  m_pidController.SetOutputRange(kMinOutput, kMaxOutput);
+
+  //CAMERA INIT
+  std::thread visionThread(VisionThread);
+  visionThread.detach();
+
+
   m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
   m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
   frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
@@ -72,11 +130,7 @@ void Robot::AutonomousInit() {
 }
 
 void Robot::AutonomousPeriodic() {
-  if (m_autoSelected == kAutoNameCustom) {
-    // Custom Auto goes here
-  } else {
-    // Default Auto goes here
-  }
+  Robot::TeleopPeriodic();
 }
 
 void Robot::TeleopInit() {}

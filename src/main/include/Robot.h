@@ -8,9 +8,15 @@
 #pragma once
 
 #include <string>
-
+#include "ctre/phoenix.h"
 #include <frc/IterativeRobot.h>
 #include <frc/smartdashboard/SendableChooser.h>
+#include <frc/WPILib.h>
+
+
+  VictorSPX * Roller;
+  //Limit Switch
+  frc::DigitalInput * limitSwitch;
 
 class Robot : public frc::IterativeRobot {
  public:
