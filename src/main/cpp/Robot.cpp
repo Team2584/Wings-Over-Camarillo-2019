@@ -41,6 +41,10 @@ using namespace std;
   //INIT INPUTS CLASS
   robotIO* inputs = new robotIO;
 
+  Compressor *c = new Compressor(0);
+
+  c->SetClosedLoopControl(true);
+
   string _sb;
 
   //Elevator Setup
