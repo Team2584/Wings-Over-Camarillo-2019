@@ -43,9 +43,9 @@ using namespace std;
 
   Compressor *c = new Compressor(0);
 
-  c->SetClosedLoopControl(true);
-
   string _sb;
+
+  DoubleSolenoid hatchSolenoid {1, 2};
 
   //Elevator Setup
   static const int ElevatorOneID = 5;
@@ -57,7 +57,7 @@ using namespace std;
     rev::CANPIDController m_pidController = m_ElevatorOne.GetPIDController();
 
   // Encoder object created to display position values
-  rev::CANEncoder m_encoder = m_shoulder.GetEncoder();
+  rev::CANEncoder m_encoder = m_ElevatorOne.GetEncoder();
 
     // PID coefficients
   double kP = 0.65, kI = 0.00005, kD = 0.05, kIz = 0, kFF = 0, kMaxOutput = 0.3, kMinOutput = -0.80;
@@ -73,6 +73,8 @@ static void VisionThread()
 void Robot::RobotInit() {
   static const int RollerID = 1;
 
+  c->SetClosedLoopControl(true);
+
   limitSwitch = new DigitalInput(1);
   //Roller Setup
   Roller = new WPI_VictorSPX(RollerID);
@@ -80,7 +82,7 @@ void Robot::RobotInit() {
   //SET FOLLOWER MOTORS FOR DRIVE
   m_leftFollowMotor.Follow(m_leftLeadMotor);
   m_rightFollowMotor.Follow(m_rightLeadMotor);
-  m_ElevatorTwo.Follow(m_ElevatorOne);it 
+  m_ElevatorTwo.Follow(m_ElevatorOne);
 
   //Set PID coefficients
   m_pidController.SetP(kP);
@@ -141,6 +143,8 @@ void Robot::AutonomousPeriodic() {
   //POSITION SETUP
   double pos;
 
+  double rotations;
+
   int maxPos = 2;
   int minPos = 0;
   
@@ -154,19 +158,19 @@ void Robot::AutonomousPeriodic() {
 void Robot::TeleopInit() {
   int pos = 0;
   rotations = m_encoder.GetPosition();
-  elevateMax = 5; //Arbitrary value Ignore
-  elevateMin = 0; //Arbitrary value Ignore
+  double elevateMax = 5; //Arbitrary value Ignore
+  double elevateMin = 0; //Arbitrary value Ignore
 }
 
 void Robot::TeleopPeriodic() {
 
-  if(Pos < 2 && inputs->getButtonX()){
+  if(pos < 2 && inputs->getButtonX_P()){
     //Ball Grab Position
     //Amount of NEO Rotations
     rotations = 0;
     m_pidController.SetReference(rotations, rev::ControlType::kPosition);
     //Sets Current Shoulder Position Value
-    Pos = 0;
+    pos = 0;
   }
   else{
     //Else Elevator not Moving
@@ -177,6 +181,19 @@ void Robot::TeleopPeriodic() {
     rotations = rotations + (elevatorManual);
     
     m_pidController.SetReference(rotations, rev::ControlType::kPosition);
+
+  //    //  ////////  //////////  ////////  //    //
+  //    //  //    //      //      //        //    //
+  ////////  ////////      //      //        ////////
+  //    //  //    //      //      //        //    //
+  //    //  //    //      //      ////////  //    //
+
+  if(inputs->getShoulderRight_P()){
+  hatchSolenoid.Set(frc::DoubleSolenoid::Value::kForward);
+  }
+  else if(inputs->getShoulderLeft_P()){
+    hatchSolenoid.Set(frc::DoubleSolenoid::Value::kReverse);
+  }
 
   ////////  ////////  //        //       //////// ////////
   //    //  //    //  //        //       //       //    //
@@ -199,7 +216,7 @@ void Robot::TeleopPeriodic() {
   }
 
   //Drive Setup
-  m_robotDrive.ArcadeDrive(-(inputs->getYPartner()) * 0.85, inputs->getAxisFourPartner()*0.65);
+  m_robotDrive.ArcadeDrive(-(inputs->getLStickY()) * 0.85, inputs->getRStickX()*0.65);
 
 }
 

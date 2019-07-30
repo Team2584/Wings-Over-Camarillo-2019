@@ -150,22 +150,22 @@ double robotIO::getRStickY(){
 ////////////////////////////////////////PARTNER CONTROLLS SETUP///////////////////////////////////////////////////
 
 bool robotIO::getButtonX_P(){
-    buttonX_P = m_partner->GetRawButton(1);
+    buttonX_P = m_partner->GetRawButtonPressed(1);
     return buttonX_P;
 }
 
 bool robotIO::getButtonCircle_P(){
-    buttonCircle_P = m_partner->GetRawButton(2);
+    buttonCircle_P = m_partner->GetRawButtonPressed(2);
     return buttonCircle_P;
 }
 
 bool robotIO::getButtonTriangle_P(){
-    buttonTriangle_P = m_partner->GetRawButton(3);
+    buttonTriangle_P = m_partner->GetRawButtonPressed(3);
     return buttonTriangle_P;
 }
 
 bool robotIO::getButtonSquare_P(){
-    buttonSquare_P = m_partner->GetRawButton(0);
+    buttonSquare_P = m_partner->GetRawButtonPressed(0);
     return buttonSquare_P;
 }
 
@@ -180,12 +180,12 @@ bool robotIO::getButtonShare_P(){
 }
 
 bool robotIO::getShoulderRight_P(){
-    shoulderRight_P = m_partner->GetRawButton(5);
+    shoulderRight_P = m_partner->GetRawButtonPressed(5);
     return shoulderRight_P;
 }
 
 bool robotIO::getShoulderLeft_P(){
-    shoulderLeft_P = m_partner->GetRawButton(4);
+    shoulderLeft_P = m_partner->GetRawButtonPressed(4);
     return shoulderLeft_P;
 }
 
