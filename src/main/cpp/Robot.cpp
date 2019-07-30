@@ -54,7 +54,7 @@ using namespace std;
   static const int ElevatorTwoID = 6;
   rev::CANSparkMax m_ElevatorTwo{ElevatorTwoID, rev::CANSparkMax::MotorType::kBrushless};
 
-    rev::CANPIDController m_pidController = m_shoulder.GetPIDController();
+    rev::CANPIDController m_pidController = m_ElevatorOne.GetPIDController();
 
   // Encoder object created to display position values
   rev::CANEncoder m_encoder = m_shoulder.GetEncoder();
@@ -80,6 +80,7 @@ void Robot::RobotInit() {
   //SET FOLLOWER MOTORS FOR DRIVE
   m_leftFollowMotor.Follow(m_leftLeadMotor);
   m_rightFollowMotor.Follow(m_rightLeadMotor);
+  m_ElevatorTwo.Follow(m_ElevatorOne);it 
 
   //Set PID coefficients
   m_pidController.SetP(kP);
@@ -142,6 +143,8 @@ void Robot::AutonomousPeriodic() {
 
   int maxPos = 2;
   int minPos = 0;
+  
+  double elevatorManual;
 
   //Setup Drive Function
   frc::DifferentialDrive m_robotDrive{m_leftLeadMotor, m_rightLeadMotor};
@@ -151,11 +154,29 @@ void Robot::AutonomousPeriodic() {
 void Robot::TeleopInit() {
   int pos = 0;
   rotations = m_encoder.GetPosition();
-  elevateMax = -93.75; //Arbitrary value Ignore
-  elevateMin = 2.5; //Arbitrary value Ignore
+  elevateMax = 5; //Arbitrary value Ignore
+  elevateMin = 0; //Arbitrary value Ignore
 }
 
 void Robot::TeleopPeriodic() {
+
+  if(Pos < 2 && inputs->getButtonX()){
+    //Ball Grab Position
+    //Amount of NEO Rotations
+    rotations = 0;
+    m_pidController.SetReference(rotations, rev::ControlType::kPosition);
+    //Sets Current Shoulder Position Value
+    Pos = 0;
+  }
+  else{
+    //Else Elevator not Moving
+    elevatorManual = 0;
+    }
+
+    //Sets Shoulder Position
+    rotations = rotations + (elevatorManual);
+    
+    m_pidController.SetReference(rotations, rev::ControlType::kPosition);
 
   ////////  ////////  //        //       //////// ////////
   //    //  //    //  //        //       //       //    //
