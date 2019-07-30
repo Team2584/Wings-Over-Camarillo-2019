@@ -53,9 +53,6 @@ using namespace std; //Same as above except to avoid std::
   static const int ElevatorOneID = 5;
   rev::CANSparkMax m_ElevatorOne{ElevatorOneID, rev::CANSparkMax::MotorType::kBrushless};
 
-  static const int ElevatorTwoID = 6;
-  rev::CANSparkMax m_ElevatorTwo{ElevatorTwoID, rev::CANSparkMax::MotorType::kBrushless};
-
   //CREATE ELEVATOR PID
   rev::CANPIDController m_pidController = m_ElevatorOne.GetPIDController();
 
@@ -89,9 +86,6 @@ void Robot::RobotInit() {
   //SET FOLLOWER MOTORS FOR DRIVE
   m_leftFollowMotor.Follow(m_leftLeadMotor);
   m_rightFollowMotor.Follow(m_rightLeadMotor);
-
-  //SET FOLLOWER MOTORS FOR ELEVATOR
-  m_ElevatorTwo.Follow(m_ElevatorOne);
 
   //Set PID coefficients
   m_pidController.SetP(kP);
@@ -133,16 +127,6 @@ void Robot::RobotPeriodic() {}
  * make sure to add them to the chooser code above as well.
  */
 void Robot::AutonomousInit() {
-  m_autoSelected = m_chooser.GetSelected();
-  // m_autoSelected = SmartDashboard::GetString(
-  //     "Auto Selector", kAutoNameDefault);
-  std::cout << "Auto selected: " << m_autoSelected << std::endl;
-
-  if (m_autoSelected == kAutoNameCustom) {
-    // Custom Auto goes here
-  } else {
-    // Default Auto goes here
-  }
 }
 
 void Robot::AutonomousPeriodic() {
@@ -176,10 +160,42 @@ void Robot::TeleopInit() {
 void Robot::TeleopPeriodic() {
 
   //CREATE ELEVATOR PID
-  if(pos < 2 && inputs->getButtonX_P()){
+  if(pos < 2 && inputs->getButtonTriangle_P()){
     //Ball Grab Position
     //Amount of NEO Rotations
-    rotations = 0;
+    rotations = 0;//RANDOM NUMBER
+    m_pidController.SetReference(rotations, rev::ControlType::kPosition);
+    //Sets Current Shoulder Position Value
+    pos = 0;
+  }
+  else if(pos == 0 && inputs->getButtonTriangle_P()){
+    //Ball Grab Position
+    //Amount of NEO Rotations
+    rotations = 25;//RANDOM NUMBER
+    m_pidController.SetReference(rotations, rev::ControlType::kPosition);
+    //Sets Current Shoulder Position Value
+    pos = 1;
+  }
+  else if(pos == 1 && inputs->getButtonTriangle_P()){
+    //Ball Grab Position
+    //Amount of NEO Rotations
+    rotations = 50;//RANDOM NUMBER
+    m_pidController.SetReference(rotations, rev::ControlType::kPosition);
+    //Sets Current Shoulder Position Value
+    pos = 2;
+  }
+  else if(pos == 2 && inputs->getButtonX_P()){
+    //Ball Grab Position
+    //Amount of NEO Rotations
+    rotations = 25;//RANDOM NUMBER
+    m_pidController.SetReference(rotations, rev::ControlType::kPosition);
+    //Sets Current Shoulder Position Value
+    pos = 1;
+  }
+  else if(pos == 1 && inputs->getButtonX_P()){
+    //Ball Grab Position
+    //Amount of NEO Rotations
+    rotations = 0;//RANDOM NUMBER
     m_pidController.SetReference(rotations, rev::ControlType::kPosition);
     //Sets Current Shoulder Position Value
     pos = 0;
