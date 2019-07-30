@@ -28,10 +28,10 @@
 #include "frc/Watchdog.h"
 #include <string>
 
-using namespace frc;
-using namespace std;
+using namespace frc; //to avoid using frc:: in declarations
+using namespace std; //Same as above except to avoid std::
 
-  //Drive Setup
+  //Drive Motor Setup
   static const int leftLeadDeviceID = 1, rightLeadDeviceID = 3, leftFollowDeviceID = 2 , rightFollowDeviceID = 4;
   rev::CANSparkMax m_leftLeadMotor{leftLeadDeviceID, rev::CANSparkMax::MotorType::kBrushless};
   rev::CANSparkMax m_rightLeadMotor{rightLeadDeviceID, rev::CANSparkMax::MotorType::kBrushless};
@@ -41,10 +41,12 @@ using namespace std;
   //INIT INPUTS CLASS
   robotIO* inputs = new robotIO;
 
+  //INIT COMPRESSOR
   Compressor *c = new Compressor(0);
 
   string _sb;
 
+//INIT HATCH MECH SOLENOID
   DoubleSolenoid hatchSolenoid {1, 2};
 
   //Elevator Setup
@@ -54,12 +56,13 @@ using namespace std;
   static const int ElevatorTwoID = 6;
   rev::CANSparkMax m_ElevatorTwo{ElevatorTwoID, rev::CANSparkMax::MotorType::kBrushless};
 
-    rev::CANPIDController m_pidController = m_ElevatorOne.GetPIDController();
+  //CREATE ELEVATOR PID
+  rev::CANPIDController m_pidController = m_ElevatorOne.GetPIDController();
 
   // Encoder object created to display position values
   rev::CANEncoder m_encoder = m_ElevatorOne.GetEncoder();
 
-    // PID coefficients
+  // PID coefficients
   double kP = 0.65, kI = 0.00005, kD = 0.05, kIz = 0, kFF = 0, kMaxOutput = 0.3, kMinOutput = -0.80;
 
 //LOGITECH CAMERA INIT
@@ -71,17 +74,23 @@ static void VisionThread()
     }
 
 void Robot::RobotInit() {
+  //SET ROLLER ID
   static const int RollerID = 1;
 
+  //TURN ON COMPRESSOR
   c->SetClosedLoopControl(true);
 
+  //CREATE LIMIT SWITCH
   limitSwitch = new DigitalInput(1);
+
   //Roller Setup
   Roller = new WPI_VictorSPX(RollerID);
 
   //SET FOLLOWER MOTORS FOR DRIVE
   m_leftFollowMotor.Follow(m_leftLeadMotor);
   m_rightFollowMotor.Follow(m_rightLeadMotor);
+
+  //SET FOLLOWER MOTORS FOR ELEVATOR
   m_ElevatorTwo.Follow(m_ElevatorOne);
 
   //Set PID coefficients
@@ -148,6 +157,7 @@ void Robot::AutonomousPeriodic() {
   int maxPos = 2;
   int minPos = 0;
   
+  //ELEVATOR MANUAL CONTROL SETUP
   double elevatorManual;
 
   //Setup Drive Function
@@ -156,6 +166,7 @@ void Robot::AutonomousPeriodic() {
   double rollerSpeed = 0;
 
 void Robot::TeleopInit() {
+  //SET STARTING VALUES
   int pos = 0;
   rotations = m_encoder.GetPosition();
   double elevateMax = 5; //Arbitrary value Ignore
@@ -164,6 +175,7 @@ void Robot::TeleopInit() {
 
 void Robot::TeleopPeriodic() {
 
+  //CREATE ELEVATOR PID
   if(pos < 2 && inputs->getButtonX_P()){
     //Ball Grab Position
     //Amount of NEO Rotations
@@ -177,9 +189,10 @@ void Robot::TeleopPeriodic() {
     elevatorManual = 0;
     }
 
-    //Sets Shoulder Position
+    //SETS DESIRED POSITION
     rotations = rotations + (elevatorManual);
     
+    //WRITE DESIRED POSITION TO PID CONTROLLER
     m_pidController.SetReference(rotations, rev::ControlType::kPosition);
 
   //    //  ////////  //////////  ////////  //    //
@@ -188,9 +201,11 @@ void Robot::TeleopPeriodic() {
   //    //  //    //      //      //        //    //
   //    //  //    //      //      ////////  //    //
 
+  //HATCH SOLENOID FORWARD
   if(inputs->getShoulderRight_P()){
   hatchSolenoid.Set(frc::DoubleSolenoid::Value::kForward);
   }
+  //HATCH SOLENOID REVERSE
   else if(inputs->getShoulderLeft_P()){
     hatchSolenoid.Set(frc::DoubleSolenoid::Value::kReverse);
   }
