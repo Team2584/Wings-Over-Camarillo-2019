@@ -133,9 +133,50 @@ void Robot::AutonomousPeriodic() {
   Robot::TeleopPeriodic();
 }
 
-void Robot::TeleopInit() {}
+  //POSITION SETUP
+  double pos;
 
-void Robot::TeleopPeriodic() {}
+  int maxPos = 2;
+  int minPos = 0;
+
+  //Setup Drive Function
+  frc::DifferentialDrive m_robotDrive{m_leftLeadMotor, m_rightLeadMotor};
+
+  double rollerSpeed = 0;
+
+void Robot::TeleopInit() {
+  int pos = 0;
+  rotations = m_encoder.GetPosition();
+  elevateMax = -93.75; //Arbitrary value Ignore
+  elevateMin = 2.5; //Arbitrary value Ignore
+}
+
+void Robot::TeleopPeriodic() {
+
+  ////////  ////////  //        //       //////// ////////
+  //    //  //    //  //        //       //       //    //
+  ///////   //    //  //        //       //////   ///////
+  //  //    //    //  //        //       //       //  //
+  //    //  ///////   ////////  //////// //////// //    //
+
+  if(inputs->getShoulderRight() > 0.05){
+    Roller->Set(ControlMode::PercentOutput, inputs->getShoulderRight());
+  }
+
+  else if(inputs->getShoulderLeft() > 0.05){
+    Roller->Set(ControlMode::PercentOutput, -inputs->getShoulderLeft());    
+  }
+
+  else{
+    //Passive Speed -10%
+    rollerSpeed = -0.1;
+    Roller->Set(ControlMode::PercentOutput, rollerSpeed);
+  }
+
+  //Drive Setup
+  m_robotDrive.ArcadeDrive(-(inputs->getYPartner()) * 0.85, inputs->getAxisFourPartner()*0.65);
+
+}
 
 void Robot::TestPeriodic() {}
 
