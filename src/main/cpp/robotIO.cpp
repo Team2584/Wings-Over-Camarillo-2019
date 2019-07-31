@@ -63,62 +63,62 @@ double lTrigger_P; //Axis 3
 /////////////////////////////////////////CONTROLLS SETUP///////////////////////////////////////////////////
 
 robotIO::robotIO() {
-    Joystick * m_stick = new Joystick(3);
-    Joystick * m_partner = new Joystick(4);
+    Joystick * m_stick = new Joystick(1);
+    Joystick * m_partner = new Joystick(2);
 }
 
 bool robotIO::getButtonX(){
-    buttonX = m_stick->GetRawButton(1);
+    buttonX = m_stick->GetRawButton(2);
     return buttonX;
 }
 
 bool robotIO::getButtonCircle(){
-    buttonCircle = m_stick->GetRawButton(2);
+    buttonCircle = m_stick->GetRawButton(3);
     return buttonCircle;
 }
 
 bool robotIO::getButtonTriangle(){
-    buttonTriangle = m_stick->GetRawButton(3);
+    buttonTriangle = m_stick->GetRawButton(4);
     return buttonTriangle;
 }
 
 bool robotIO::getButtonSquare(){
-    buttonSquare = m_stick->GetRawButton(0);
+    buttonSquare = m_stick->GetRawButton(1);
     return buttonSquare;
 }
 
 bool robotIO::getButtonOptions(){
-    buttonOptions = m_stick->GetRawButton(9);
+    buttonOptions = m_stick->GetRawButton(10);
     return buttonOptions;
 }
 
 bool robotIO::getButtonShare(){
-    buttonShare = m_stick->GetRawButton(8);
+    buttonShare = m_stick->GetRawButton(9);
     return buttonShare;
 }
 
 bool robotIO::getShoulderRight(){
-    shoulderRight = m_stick->GetRawButton(5);
+    shoulderRight = m_stick->GetRawButton(6);
     return shoulderRight;
 }
 
 bool robotIO::getShoulderLeft(){
-    shoulderLeft = m_stick->GetRawButton(4);
+    shoulderLeft = m_stick->GetRawButton(5);
     return shoulderLeft;
 }
 
 bool robotIO::getBigButton(){
-    bigButton = m_stick->GetRawButton(13);
+    bigButton = m_stick->GetRawButton(14);
     return bigButton;
 }
 
 bool robotIO::getButtonPressLStick(){
-    buttonPressLStick = m_stick->GetRawButton(10);
+    buttonPressLStick = m_stick->GetRawButton(11);
     return buttonPressLStick;
 }
 
 bool robotIO::getButtonPressRStick(){
-    buttonPressRStick = m_stick->GetRawButton(11);
+    buttonPressRStick = m_stick->GetRawButton(12);
     return buttonPressRStick;
 }
 
@@ -150,57 +150,57 @@ double robotIO::getRStickY(){
 ////////////////////////////////////////PARTNER CONTROLLS SETUP///////////////////////////////////////////////////
 
 bool robotIO::getButtonX_P(){
-    buttonX_P = m_partner->GetRawButtonPressed(1);
+    buttonX_P = m_partner->GetRawButtonPressed(2);
     return buttonX_P;
 }
 
 bool robotIO::getButtonCircle_P(){
-    buttonCircle_P = m_partner->GetRawButtonPressed(2);
+    buttonCircle_P = m_partner->GetRawButtonPressed(3);
     return buttonCircle_P;
 }
 
 bool robotIO::getButtonTriangle_P(){
-    buttonTriangle_P = m_partner->GetRawButtonPressed(3);
+    buttonTriangle_P = m_partner->GetRawButtonPressed(4);
     return buttonTriangle_P;
 }
 
 bool robotIO::getButtonSquare_P(){
-    buttonSquare_P = m_partner->GetRawButtonPressed(0);
+    buttonSquare_P = m_partner->GetRawButtonPressed(1);
     return buttonSquare_P;
 }
 
 bool robotIO::getButtonOptions_P(){
-    buttonOptions_P = m_partner->GetRawButton(9);
+    buttonOptions_P = m_partner->GetRawButton(10);
     return buttonOptions_P;
 }
 
 bool robotIO::getButtonShare_P(){
-    buttonShare_P = m_partner->GetRawButton(8);
+    buttonShare_P = m_partner->GetRawButton(9);
     return buttonShare_P;
 }
 
 bool robotIO::getShoulderRight_P(){
-    shoulderRight_P = m_partner->GetRawButtonPressed(5);
+    shoulderRight_P = m_partner->GetRawButtonPressed(6);
     return shoulderRight_P;
 }
 
 bool robotIO::getShoulderLeft_P(){
-    shoulderLeft_P = m_partner->GetRawButtonPressed(4);
+    shoulderLeft_P = m_partner->GetRawButtonPressed(5);
     return shoulderLeft_P;
 }
 
 bool robotIO::getBigButton_P(){
-    bigButton_P = m_partner->GetRawButton(13);
+    bigButton_P = m_partner->GetRawButton(14);
     return bigButton_P;
 }
 
 bool robotIO::getButtonPressLStick_P(){
-    buttonPressLStick_P = m_partner->GetRawButton(10);
+    buttonPressLStick_P = m_partner->GetRawButton(11);
     return buttonPressLStick_P;
 }
 
 bool robotIO::getButtonPressRStick_P(){
-    buttonPressRStick_P = m_partner->GetRawButton(11);
+    buttonPressRStick_P = m_partner->GetRawButton(12);
     return buttonPressRStick_P;
 }
 
@@ -228,5 +228,3 @@ double robotIO::getRStickY_P(){
     rStickY_P = m_partner->GetRawAxis(2);
     return rStickY_P;
 }
-
-

@@ -1,7 +1,0 @@
-LISTED IN ORDER OF IMPORTANCE
-
-Finish elevator PID
-Add limit switch soft stops
-Change "GetRawButton"s to "GetRawButtonPressed"s
-Test camera
-Test literally everything

@@ -4,7 +4,6 @@
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
-
 #include "Robot.h"
 #include "ctre/Phoenix.h"
 #include "rev/CANSparkMax.h"
@@ -28,26 +27,20 @@
 #include "frc/Watchdog.h"
 #include <string>
 
-using namespace frc; //to avoid using frc:: in declarations
-using namespace std; //Same as above except to avoid std::
+using namespace frc;
+using namespace std;
 
-  //Drive Motor Setup
+//INIT INPUTS CLASS
+robotIO* inputs = new robotIO;
+
+string _sb;
+
+  //Drive Setup
   static const int leftLeadDeviceID = 1, rightLeadDeviceID = 3, leftFollowDeviceID = 2 , rightFollowDeviceID = 4;
   rev::CANSparkMax m_leftLeadMotor{leftLeadDeviceID, rev::CANSparkMax::MotorType::kBrushless};
   rev::CANSparkMax m_rightLeadMotor{rightLeadDeviceID, rev::CANSparkMax::MotorType::kBrushless};
   rev::CANSparkMax m_leftFollowMotor{leftFollowDeviceID, rev::CANSparkMax::MotorType::kBrushless};
   rev::CANSparkMax m_rightFollowMotor{rightFollowDeviceID, rev::CANSparkMax::MotorType::kBrushless};
-
-  //INIT INPUTS CLASS
-  robotIO* inputs = new robotIO;
-
-  //INIT COMPRESSOR
-  Compressor *c = new Compressor(0);
-
-  string _sb;
-
-//INIT HATCH MECH SOLENOID
-  DoubleSolenoid hatchSolenoid {1, 2};
 
   //Elevator Setup
   static const int ElevatorOneID = 5;
@@ -60,32 +53,9 @@ using namespace std; //Same as above except to avoid std::
   rev::CANEncoder m_encoder = m_ElevatorOne.GetEncoder();
 
   // PID coefficients
-  double kP = 0.65, kI = 0.00005, kD = 0.05, kIz = 0, kFF = 0, kMaxOutput = 0.3, kMinOutput = -0.80;
-
-//LOGITECH CAMERA INIT
-static void VisionThread()
-    {
-        cs::UsbCamera camera = CameraServer::GetInstance()->StartAutomaticCapture();
-        camera.SetResolution(272, 204);
-        camera.SetFPS(22);
-    }
+  double kP = 0.1, kI = 0.0, kD = 0.25, kIz = 0, kFF = 0, kMaxOutput = 1, kMinOutput = -1;
 
 void Robot::RobotInit() {
-  //SET ROLLER ID
-  static const int RollerID = 1;
-
-  //TURN ON COMPRESSOR
-  c->SetClosedLoopControl(true);
-
-  //CREATE LIMIT SWITCH
-  limitSwitch = new DigitalInput(1);
-
-  //Roller Setup
-  Roller = new WPI_VictorSPX(RollerID);
-
-  //SET FOLLOWER MOTORS FOR DRIVE
-  m_leftFollowMotor.Follow(m_leftLeadMotor);
-  m_rightFollowMotor.Follow(m_rightLeadMotor);
 
   //Set PID coefficients
   m_pidController.SetP(kP);
@@ -95,11 +65,10 @@ void Robot::RobotInit() {
   m_pidController.SetFF(kFF);
   m_pidController.SetOutputRange(kMinOutput, kMaxOutput);
 
-  //CAMERA INIT
-  std::thread visionThread(VisionThread);
-  visionThread.detach();
-
-
+  //SET FOLLOWER MOTORS FOR DRIVE
+  m_leftFollowMotor.Follow(m_leftLeadMotor);
+  m_rightFollowMotor.Follow(m_rightLeadMotor);
+  
   m_chooser.SetDefaultOption(kAutoNameDefault, kAutoNameDefault);
   m_chooser.AddOption(kAutoNameCustom, kAutoNameCustom);
   frc::SmartDashboard::PutData("Auto Modes", &m_chooser);
@@ -127,13 +96,27 @@ void Robot::RobotPeriodic() {}
  * make sure to add them to the chooser code above as well.
  */
 void Robot::AutonomousInit() {
+  m_autoSelected = m_chooser.GetSelected();
+  // m_autoSelected = SmartDashboard::GetString(
+  //     "Auto Selector", kAutoNameDefault);
+  std::cout << "Auto selected: " << m_autoSelected << std::endl;
+
+  if (m_autoSelected == kAutoNameCustom) {
+    // Custom Auto goes here
+  } else {
+    // Default Auto goes here
+  }
 }
 
 void Robot::AutonomousPeriodic() {
-  Robot::TeleopPeriodic();
+  if (m_autoSelected == kAutoNameCustom) {
+    // Custom Auto goes here
+  } else {
+    // Default Auto goes here
+  }
 }
 
-  //POSITION SETUP
+//POSITION SETUP
   double pos;
 
   double rotations;
@@ -144,34 +127,20 @@ void Robot::AutonomousPeriodic() {
   //ELEVATOR MANUAL CONTROL SETUP
   double elevatorManual;
 
-  //Setup Drive Function
-  frc::DifferentialDrive m_robotDrive{m_leftLeadMotor, m_rightLeadMotor};
-
-  double rollerSpeed = 0;
-
 void Robot::TeleopInit() {
-  //SET STARTING VALUES
+
   int pos = 0;
   rotations = m_encoder.GetPosition();
-  double elevateMax = 5; //Arbitrary value Ignore
-  double elevateMin = 0; //Arbitrary value Ignore
+  double elevateMax = -430;
+  double elevateMin = -20;
 }
 
 void Robot::TeleopPeriodic() {
-
   //CREATE ELEVATOR PID
-  if(pos < 2 && inputs->getButtonTriangle_P()){
+  if(pos == 0 && inputs->getButtonTriangle_P()){
     //Ball Grab Position
     //Amount of NEO Rotations
-    rotations = 0;//RANDOM NUMBER
-    m_pidController.SetReference(rotations, rev::ControlType::kPosition);
-    //Sets Current Shoulder Position Value
-    pos = 0;
-  }
-  else if(pos == 0 && inputs->getButtonTriangle_P()){
-    //Ball Grab Position
-    //Amount of NEO Rotations
-    rotations = 25;//RANDOM NUMBER
+    rotations = -278;//RANDOM NUMBER
     m_pidController.SetReference(rotations, rev::ControlType::kPosition);
     //Sets Current Shoulder Position Value
     pos = 1;
@@ -179,7 +148,7 @@ void Robot::TeleopPeriodic() {
   else if(pos == 1 && inputs->getButtonTriangle_P()){
     //Ball Grab Position
     //Amount of NEO Rotations
-    rotations = 50;//RANDOM NUMBER
+    rotations = -425;//RANDOM NUMBER
     m_pidController.SetReference(rotations, rev::ControlType::kPosition);
     //Sets Current Shoulder Position Value
     pos = 2;
@@ -187,7 +156,7 @@ void Robot::TeleopPeriodic() {
   else if(pos == 2 && inputs->getButtonX_P()){
     //Ball Grab Position
     //Amount of NEO Rotations
-    rotations = 25;//RANDOM NUMBER
+    rotations = -278;//RANDOM NUMBER
     m_pidController.SetReference(rotations, rev::ControlType::kPosition);
     //Sets Current Shoulder Position Value
     pos = 1;
@@ -195,7 +164,7 @@ void Robot::TeleopPeriodic() {
   else if(pos == 1 && inputs->getButtonX_P()){
     //Ball Grab Position
     //Amount of NEO Rotations
-    rotations = 0;//RANDOM NUMBER
+    rotations = -7;//RANDOM NUMBER
     m_pidController.SetReference(rotations, rev::ControlType::kPosition);
     //Sets Current Shoulder Position Value
     pos = 0;
@@ -210,45 +179,11 @@ void Robot::TeleopPeriodic() {
     
     //WRITE DESIRED POSITION TO PID CONTROLLER
     m_pidController.SetReference(rotations, rev::ControlType::kPosition);
-
-  //    //  ////////  //////////  ////////  //    //
-  //    //  //    //      //      //        //    //
-  ////////  ////////      //      //        ////////
-  //    //  //    //      //      //        //    //
-  //    //  //    //      //      ////////  //    //
-
-  //HATCH SOLENOID FORWARD
-  if(inputs->getShoulderRight_P()){
-  hatchSolenoid.Set(frc::DoubleSolenoid::Value::kForward);
-  }
-  //HATCH SOLENOID REVERSE
-  else if(inputs->getShoulderLeft_P()){
-    hatchSolenoid.Set(frc::DoubleSolenoid::Value::kReverse);
-  }
-
-  ////////  ////////  //        //       //////// ////////
-  //    //  //    //  //        //       //       //    //
-  ///////   //    //  //        //       //////   ///////
-  //  //    //    //  //        //       //       //  //
-  //    //  ///////   ////////  //////// //////// //    //
-
-  if(inputs->getShoulderRight() > 0.05){
-    Roller->Set(ControlMode::PercentOutput, inputs->getShoulderRight());
-  }
-
-  else if(inputs->getShoulderLeft() > 0.05){
-    Roller->Set(ControlMode::PercentOutput, -inputs->getShoulderLeft());    
-  }
-
-  else{
-    //Passive Speed -10%
-    rollerSpeed = -0.1;
-    Roller->Set(ControlMode::PercentOutput, rollerSpeed);
-  }
-
-  //Drive Setup
-  m_robotDrive.ArcadeDrive(-(inputs->getLStickY()) * 0.85, inputs->getRStickX()*0.65);
-
+  //m_ElevatorOne.Set(inputs->getLStickY());
+  SmartDashboard::PutNumber("ElevatorHeight", m_encoder.GetPosition());
+  SmartDashboard::PutNumber("ElevatorTarget", rotations);
+  SmartDashboard::PutNumber("Position", pos);
+  //m_robotDrive.ArcadeDrive(-(inputs->getLStickY()) * 0.85, inputs->getRStickX()*0.65);
 }
 
 void Robot::TestPeriodic() {}
