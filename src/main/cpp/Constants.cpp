@@ -6,5 +6,13 @@
 /*----------------------------------------------------------------------------*/
 
 #include "Constants.h"
+#include <string>
+#include "ctre/phoenix.h"
+#include <frc/IterativeRobot.h>
+#include <frc/smartdashboard/SendableChooser.h>
+#include <frc/WPILib.h>
+
+double current;
 
 Constants::Constants() {}
+

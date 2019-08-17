@@ -68,7 +68,7 @@ robotIO::robotIO() {
 }
 
 bool robotIO::getButtonX(){
-    buttonX = m_stick->GetRawButton(2);
+    buttonX = m_stick->GetRawButtonPressed(2);
     return buttonX;
 }
 
@@ -78,7 +78,7 @@ bool robotIO::getButtonCircle(){
 }
 
 bool robotIO::getButtonTriangle(){
-    buttonTriangle = m_stick->GetRawButton(4);
+    buttonTriangle = m_stick->GetRawButtonPressed(4);
     return buttonTriangle;
 }
 
@@ -138,12 +138,12 @@ double robotIO::getLStickY(){
 }
 
 double robotIO::getRStickX(){
-    rStickX = m_stick->GetRawAxis(5);
+    rStickX = m_stick->GetRawAxis(2);
     return rStickX;
 }
 
 double robotIO::getRStickY(){
-    rStickY = m_stick->GetRawAxis(2);
+    rStickY = m_stick->GetRawAxis(5);
     return rStickY;
 }
 
@@ -220,11 +220,11 @@ double robotIO::getLStickY_P(){
 }
 
 double robotIO::getRStickX_P(){
-    rStickX_P = m_partner->GetRawAxis(5);
+    rStickX_P = m_partner->GetRawAxis(2);
     return rStickX_P;
 }
 
 double robotIO::getRStickY_P(){
-    rStickY_P = m_partner->GetRawAxis(2);
+    rStickY_P = m_partner->GetRawAxis(5);
     return rStickY_P;
 }

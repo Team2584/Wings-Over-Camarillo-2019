@@ -10,4 +10,6 @@
 class Constants {
  public:
   Constants();
+
+  double getElevatorCurrent();
 };
